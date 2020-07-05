@@ -1,31 +1,28 @@
 import express from 'express';
+import knex from './database/connection';
 
 const routes = express.Router();
 
-const scores = [
-  {id: 1, name: 'matheus', score: 20},
-  {id: 2, name: 'nobre', score: 10},
-  {id: 3, name: 'pinto', score: 12},
-];
+routes.get('/highscores', async (request, response) => {
+  const search = request.query.search;
 
-routes.get('/highscores', (request, response) => {
-  const search = String(request.query.search);
+  const scores = await knex('hiscores').select('*');
 
-  const filteredScores = search ? scores.filter(user => user.name.includes(search)) : scores;
+  const filteredScores = search ? scores.filter(user => user.name.includes(String(search))) : scores;
 
-  response.json(scores);
+  response.json(filteredScores);
 });
 
-routes.post('/highscores', (request, response) => {
-  const data = request.body;
+// routes.post('/highscores', (request, response) => {
+//   const data = request.body;
 
-  const score = {
-    id: 5,
-    name: data.name,
-    score: data.score,
-  };
+//   const score = {
+//     id: 5,
+//     name: data.name,
+//     score: data.score,
+//   };
 
-  return response.json(score);
-});
+//   return response.json(score);
+// });
 
 export default routes;
