@@ -13,16 +13,21 @@ routes.get('/highscores', async (request, response) => {
   response.json(filteredScores);
 });
 
-// routes.post('/highscores', (request, response) => {
-//   const data = request.body;
+routes.post('/highscores', async (request, response) => {
+  const score = request.body;
+  
+  const trx = await knex.transaction();
 
-//   const score = {
-//     id: 5,
-//     name: data.name,
-//     score: data.score,
-//   };
+  const item = {
+    ...score,
+    date: new Date().toISOString().replace('Z','').replace('T', ' ').substr(0, 19),
+  };
+  
+  const _id = await trx('hiscores').insert(item);
 
-//   return response.json(score);
-// });
+  await trx.commit();
+  
+  return response.json({ _id, ...item });
+});
 
 export default routes;
